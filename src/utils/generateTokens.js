@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken'
 
-const generateTokens = (payload, UUID) => {
-	const isTestUUID = UUID ? UUID in ['1', '2', '3', '4'] : false
+const generateTokens = (payload) => {
+	const isTestUUID = payload.UUID
+		? payload.UUID in ['1', '2', '3', '4']
+		: false
 	const hundredYearLater = '36500d' // 365 * 100 days
 
 	return {
