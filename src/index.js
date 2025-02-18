@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 
 import prisma from './config/prisma.js'
-import generateRandomUsername from './utils/generateRandomUsername.js'
 import generateTokens from './utils/generateTokens.js'
 
 const app = express()
@@ -35,18 +34,16 @@ app.post('/auth/login', async (req, res) => {
 	if (!existingUser) {
 		const UUID = uuidv4()
 		const hashedPassword = await hash(data.password)
-		const username = generateRandomUsername()
 
 		const newUser = await prisma.user.create({
 			data: {
 				id: UUID,
 				email: data.email,
-				username: username,
 				password: hashedPassword,
 			},
 		})
 
-		const tokens = generateTokens({ UUID, username })
+		const tokens = generateTokens({ UUID })
 
 		await prisma.user.update({
 			where: { id: newUser.id },
@@ -65,7 +62,6 @@ app.post('/auth/login', async (req, res) => {
 	const tokens = generateTokens(
 		{
 			UUID: existingUser.UUID,
-			username: existingUser.username,
 		},
 		existingUser.UUID,
 	)
@@ -100,7 +96,6 @@ app.get('/auth/refresh', async (req, res) => {
 		const tokens = generateTokens(
 			{
 				UUID: existingUser.UUID,
-				username: existingUser.username,
 			},
 			existingUser.UUID,
 		)
@@ -124,10 +119,10 @@ async function main() {
 
 	if (!testAccount1) {
 		const payloads = [
-			{ UUID: '1', username: 'test1' },
-			{ UUID: '2', username: 'test2' },
-			{ UUID: '3', username: 'test3' },
-			{ UUID: '4', username: 'test4' },
+			{ UUID: '1' },
+			{ UUID: '2' },
+			{ UUID: '3' },
+			{ UUID: '4' },
 		]
 
 		payloads.forEach(async (payload) => {
@@ -136,8 +131,7 @@ async function main() {
 			const newUser = await prisma.user.create({
 				data: {
 					UUID: payload.UUID,
-					email: `${payload.username}@gmail.com`,
-					username: payload.username,
+					email: `test${payload.UUID}@gmail.com`,
 					password: hashedPassword,
 				},
 			})

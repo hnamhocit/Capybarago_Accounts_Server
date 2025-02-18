@@ -11,7 +11,6 @@ model User {
   id           Int      @id @default(autoincrement())
   UUID         String   @unique
   email        String   @unique
-  username     String   @unique
   password     String
   avatar       String?
   refreshToken String?
